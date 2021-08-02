@@ -1,6 +1,6 @@
 import { ISchema, Schema } from '@formily/json-schema'
 import { ITreeNode, TreeNode } from '@designable/core'
-import { clone } from '@designable/shared'
+import { clone, uid } from '@designable/shared'
 
 export interface ITransformerOptions {
   designableFieldName?: string
@@ -39,7 +39,7 @@ export const transformToSchema = (
     if (node !== root) {
       Object.assign(schema, clone(node.props))
     }
-    schema._designableId = node.id
+    schema['_designableId'] = node.id
     if (schema.type === 'array') {
       if (node.children[0]) {
         if (
@@ -81,25 +81,30 @@ export const transformToTreeNode = (
     children: [],
   }
   const schema = new Schema(formily.schema)
+  const cleanProps = (props: any) => {
+    delete props['version']
+    delete props['_isJSONSchemaObject']
+    return props
+  }
   const appendTreeNode = (parent: ITreeNode, schema: Schema) => {
     if (!schema) return
     const current = {
-      id: schema['_designableId'],
+      id: schema['_designableId'] || uid(),
       componentName: realOptions.designableFieldName,
-      props: schema.toJSON(false),
+      props: cleanProps(schema.toJSON(false)),
       children: [],
     }
     parent.children.push(current)
     if (schema.items && !Array.isArray(schema.items)) {
       appendTreeNode(current, schema.items)
     }
-    schema.mapProperties((schema, key) => {
-      schema['_designableId'] = schema['_designableId'] || key
+    schema.mapProperties((schema) => {
+      schema['_designableId'] = schema['_designableId'] || uid()
       appendTreeNode(current, schema)
     })
   }
-  schema.mapProperties((schema, key) => {
-    schema['_designableId'] = schema['_designableId'] || key
+  schema.mapProperties((schema) => {
+    schema['_designableId'] = schema['_designableId'] || uid()
     appendTreeNode(root, schema)
   })
   return root

@@ -1,6 +1,6 @@
 {
   "name": "@designable/shared",
-  "version": "0.3.14",
+  "version": "0.4.21",
   "license": "MIT",
   "main": "lib",
   "types": "lib/index.d.ts",
@@ -10,8 +10,8 @@
   "module": "esm",
   "scripts": {
     "build": "rimraf -rf lib esm dist && npm run build:cjs && npm run build:esm && npm run build:umd",
-    "build:cjs": "tsc --declaration",
-    "build:esm": "tsc --declaration --module es2015 --outDir esm",
+    "build:cjs": "tsc --project tsconfig.build.json",
+    "build:esm": "tsc --project tsconfig.build.json --module es2015 --outDir esm",
     "build:umd": "rollup --config"
   },
   "publishConfig": {
@@ -20,5 +20,5 @@
   "dependencies": {
     "requestidlecallback": "^0.3.0"
   },
-  "gitHead": "8a284e352ec303b8dab76760e524afcbbdacdf56"
+  "gitHead": "bda070c137ba0003cc4451b2208e089d2e326b23"
 }

@@ -6,24 +6,26 @@ import { requestIdle, cancelIdle } from '@designable/shared'
 import {
   usePrefix,
   useSelected,
+  useOperation,
   useCurrentNode,
   IconWidget,
 } from '@designable/react'
 import { SchemaField } from './SchemaField'
 import { ISettingFormProps } from './types'
-import { SettingsFormContext } from './context'
-import { useLocales } from './effects'
+import { SettingsFormContext } from './shared/context'
+import { useLocales, useSnapshot } from './effects'
 import { NodePath } from './components/NodePath'
 import { Empty } from 'antd'
 import cls from 'classnames'
 import './styles.less'
 
 const GlobalState = {
-  idleReuqest: null,
+  idleRequest: null,
 }
 
 export const SettingsForm: React.FC<ISettingFormProps> = observer(
   (props) => {
+    const operation = useOperation()
     const node = useCurrentNode()
     const selected = useSelected()
     const prefix = usePrefix('settings-form')
@@ -32,9 +34,10 @@ export const SettingsForm: React.FC<ISettingFormProps> = observer(
         values: node?.props,
         effects() {
           useLocales()
+          useSnapshot(operation)
         },
       })
-    }, [node, node?.designerProps?.propsSchema])
+    }, [node, node?.designerProps?.propsSchema, operation])
 
     const isEmpty = !(
       node &&
@@ -60,7 +63,11 @@ export const SettingsForm: React.FC<ISettingFormProps> = observer(
                 feedbackLayout="none"
                 tooltipLayout="text"
               >
-                <SchemaField schema={node.designerProps.propsSchema as any} />
+                <SchemaField
+                  schema={node.designerProps.propsSchema as any}
+                  components={props.components}
+                  scope={props.scope}
+                />
               </Form>
             </SettingsFormContext.Provider>
           </div>
@@ -84,8 +91,8 @@ export const SettingsForm: React.FC<ISettingFormProps> = observer(
   },
   {
     scheduler: (update) => {
-      cancelIdle(GlobalState.idleReuqest)
-      GlobalState.idleReuqest = requestIdle(update)
+      cancelIdle(GlobalState.idleRequest)
+      GlobalState.idleRequest = requestIdle(update)
     },
   }
 )

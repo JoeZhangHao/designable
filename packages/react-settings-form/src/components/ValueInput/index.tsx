@@ -4,10 +4,12 @@
  */
 import React from 'react'
 import { createPolyInput } from '../PolyInput'
-import { Input, InputNumber, Select } from 'antd'
+import { Input, Button, Popover, InputNumber, Select } from 'antd'
+import { MonacoInput } from '../MonacoInput'
+import { TextWidget } from '@designable/react'
 
 const STARTTAG_REX =
-  /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]*(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/
+  /<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]*(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/
 
 const EXPRESSION_REX = /^\{\{([\s\S]*)\}\}$/
 
@@ -44,16 +46,37 @@ export const ValueInput = createPolyInput([
     type: 'EXPRESSION',
     icon: 'Expression',
     component: (props: any) => {
-      return <Input {...props} prefix="{{" suffix="}}" />
+      return (
+        <Popover
+          content={
+            <div
+              style={{
+                width: 400,
+                height: 200,
+                marginLeft: -16,
+                marginRight: -16,
+                marginBottom: -12,
+              }}
+            >
+              <MonacoInput {...props} language="javascript.expression" />
+            </div>
+          }
+          trigger="click"
+        >
+          <Button block>
+            <TextWidget token="SettingComponents.ValueInput.expression" />
+          </Button>
+        </Popover>
+      )
     },
     checker: isExpression,
     toInputValue: (value) => {
-      if (value === '{{}}') return ''
+      if (value === '{{}}') return
       const matched = String(value).match(EXPRESSION_REX)
       return matched?.[1] || value || ''
     },
     toChangeValue: (value) => {
-      if (value === '{{}}') return ''
+      if (value === '{{}}') return
       const matched = String(value).match(EXPRESSION_REX)
       return `{{${matched?.[1] || value || ''}}}`
     },

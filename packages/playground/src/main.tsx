@@ -16,7 +16,7 @@ import {
   ViewportPanel,
   SettingsPanel,
 } from '@designable/react'
-import { SettingsForm } from '@designable/react-settings-form'
+import { SettingsForm, MonacoInput } from '@designable/react-settings-form'
 import { observer } from '@formily/react'
 import {
   createDesigner,
@@ -89,6 +89,23 @@ GlobalRegistry.registerDesignerProps({
         },
         'style.border': {
           'x-component': 'BorderStyleSetter',
+        },
+        test: {
+          type: 'void',
+          title: '测试',
+          'x-decorator': 'FormItem',
+          'x-component': 'DrawerSetter',
+          'x-component-props': {
+            text: '打开抽屉',
+          },
+          properties: {
+            test: {
+              type: 'string',
+              title: '测试输入',
+              'x-decorator': 'FormItem',
+              'x-component': 'Input',
+            },
+          },
         },
       },
     },
@@ -199,8 +216,8 @@ const Actions = observer(() => (
       value={GlobalRegistry.getDesignerLanguage()}
       optionType="button"
       options={[
-        { label: 'Engligh', value: 'en-US' },
-        { label: '简体中文', value: 'zh-CN' },
+        { label: 'English', value: 'en-us' },
+        { label: '简体中文', value: 'zh-cn' },
       ]}
       onChange={(e) => {
         GlobalRegistry.setDesignerLanguage(e.target.value)
@@ -250,8 +267,12 @@ const App = () => {
               <ViewPanel type="JSONTREE">
                 {(tree) => {
                   return (
-                    <div style={{ overflow: 'overlay', height: '100%' }}>
-                      JSON TREE
+                    <div style={{ overflow: 'hidden', height: '100%' }}>
+                      <MonacoInput
+                        language="javascript"
+                        helpCode="//hello world"
+                        defaultValue={`<div><div>123123<div>123123<div>123123<div>123123</div></div></div></div></div>`}
+                      />
                     </div>
                   )
                 }}
